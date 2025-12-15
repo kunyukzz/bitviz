@@ -4,7 +4,7 @@ BitViz is a small terminal-based program for **learning and teaching binary oper
 It visualizes how bitwise operations work at the **bit level**.
 
 Designed to be simple and fun.
-It should work on **Linux, macOS and BSD** (Unix=based)
+It should work on **Linux, macOS and BSD** (Unix-based)
 
 > Note: This program uses **ncurses**, so it will not work in terminals without proper TUI support.
 
