@@ -1,3 +1,35 @@
+/**
+ *
+ * MIT License
+ * Copyright 2025 kunyukz (the person who still awake at 2AM)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to
+ * deal in the Software without restriction, including without limitation the
+ * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+ * sell copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+ * IN THE SOFTWARE.
+ *
+ */
+
+/**
+ *
+ * @file bitviz.c
+ * @brief binary vizualizer - learning binary operation the fun way
+ *
+ */
+
 #include <ncurses.h>
 #include <locale.h>
 #include <string.h>
@@ -46,35 +78,36 @@ void draw_border(const char *title)
 {
     for (int x = 1; x < SCREEN_WIDTH; ++x)
     {
-        mvaddch(2, x, ACS_HLINE);
-        mvaddch(SCREEN_HEIGHT, x, ACS_HLINE);
+        mvaddch(2, x, ACS_BLOCK);
+        mvaddch(SCREEN_HEIGHT, x, ACS_BLOCK);
     }
     for (int x = 1; x < SCREEN_WIDTH; ++x)
     {
-        mvaddch(28, x, ACS_HLINE);
-        mvaddch(SCREEN_HEIGHT, x, ACS_HLINE);
-    }
-    for (int y = 1; y < SCREEN_HEIGHT; ++y)
-    {
-        mvaddch(y + 1, 0, ACS_VLINE);
-        mvaddch(y + 1, SCREEN_WIDTH, ACS_VLINE);
+        mvaddch(28, x, ACS_BLOCK);
     }
 
-    mvaddch(2, 0, ACS_ULCORNER);
-    mvaddch(2, SCREEN_WIDTH, ACS_URCORNER);
-    mvaddch(SCREEN_HEIGHT, 0, ACS_LLCORNER);
-    mvaddch(SCREEN_HEIGHT, SCREEN_WIDTH, ACS_LRCORNER);
+    for (int y = 1; y < SCREEN_HEIGHT; ++y)
+    {
+        mvaddch(y + 1, 0, ACS_BLOCK);
+        mvaddch(y + 1, SCREEN_WIDTH, ACS_BLOCK);
+    }
+
+    mvaddch(2, 0, ACS_BLOCK);
+    mvaddch(2, SCREEN_WIDTH, ACS_BLOCK);
+    mvaddch(SCREEN_HEIGHT, 0, ACS_BLOCK);
+    mvaddch(SCREEN_HEIGHT, SCREEN_WIDTH, ACS_BLOCK);
 
     unsigned long title_len = strlen(title);
     unsigned long title_x = (SCREEN_WIDTH - title_len) / 2;
 
     mvprintw(2, (int)title_x - 2, "┤ %s ├", title);
-    mvprintw(4, 4, "Imagine using 16bit processor.");
-    mvprintw(6, 4, "- Computer read binary value, base-10 (1 & 0).");
-    mvprintw(7, 4,
-             "- We also have hexadicimal value, base-16 (0123456789ABCDEF).");
-    mvprintw(8, 4,
-             "- One thing to remember, all hardware counting from 0 not 1 !");
+    mvprintw(4, 4, "Imagine a 16-bit processor.");
+    mvprintw(5, 4,
+             "Human read decimal value, base-10 (0-9). computers in binary, "
+             "base-2 (0-1)");
+    mvprintw(6, 4, "Hexadecimal (0123456789ABCDEF) is shorthand for binary:");
+    mvprintw(7, 4, "Example: 0xF = 1111, 0xA = 1010, 0x5 = 0101");
+    mvprintw(9, 4, "One thing to remember, computers count from 0, not 1 !");
 }
 
 void draw_grid(int pos_y, const char *variable, unsigned int value)
@@ -170,7 +203,7 @@ void draw_param_value(int pos_y, const char *param, unsigned int value)
 
 void draw_control(opt_t op)
 {
-    int sy = 10;
+    int sy = 11;
     int sx = 41;
     const char *op_names[] = {"", "AND", "OR", "XOR", "NOT", "<<", ">>"};
     const char *op_symbols[] = {"", "&", "|", "^", "~", "<<", ">>"};
@@ -194,7 +227,6 @@ void draw_control(opt_t op)
 
     mvprintw(sy + 15, 25, "+-------------------------------+");
     mvprintw(sy + 16, SCREEN_WIDTH / 3, "  Active Opt : %s | Symbol : %s ",op_names[op], op_symbols[op]);
-    mvprintw(sy + 17, 25, "+-------------------------------+");
     // clang-format on
 }
 
@@ -213,22 +245,22 @@ int main(void)
     unsigned int curr_value = 0;
     unsigned int opt_value = 0;
 
-    start_color();
+    if (has_colors()) start_color();
 
     while (1)
     {
         clear();
-        draw_border("2AM Bit Vizualizer");
+        draw_border("Bit Vizualizer");
 
-        if (curr_value > MAX_VALUE) curr_value = 1;
-        if (opt_value > MAX_VALUE) opt_value = 1;
+        if (curr_value > MAX_VALUE) curr_value = (unsigned int)-1;
+        if (opt_value > MAX_VALUE) opt_value = (unsigned int)-1;
 
         unsigned int result_value =
             calc_result(curr_value, opt_value, curr_opt);
 
-        draw_param_value(10, "CURRENT", curr_value);
-        draw_param_value(15, "OPT", opt_value);
-        draw_param_value(20, "RESULT", result_value);
+        draw_param_value(11, "CURRENT", curr_value);
+        draw_param_value(16, "OPT", opt_value);
+        draw_param_value(21, "RESULT", result_value);
 
         draw_control(curr_opt);
 
